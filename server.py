@@ -4,12 +4,15 @@ import socketserver
 
 from http import HTTPStatus
 
+from src import liquidity_example
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         self.send_response(HTTPStatus.OK)
         self.end_headers()
-        msg = 'Hello world! \nWelcome to yieldfarmer001! You requested the following route %s' % (self.path)
+        msg = 'Welcome to yieldfarmer001! You requested the following route %s' % (self.path)
+        if self.path == '/new':
+            msg = 'This is a new path: %s' % (self.path)
         self.wfile.write(msg.encode())
 
 
