@@ -1,7 +1,7 @@
 from web3 import Web3
 import time
 import json
-import pancake
+from pancake import Pancake
 import pair_functions
 from lib import key, abi
 
@@ -50,7 +50,7 @@ web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 #-------------------------------------------------------------------
 def run_test():
     # instantiate Pancake
-    pancake = pancake.Pancake(wallet=wallet_address, private_key=private_key)
+    pancake = Pancake(wallet=wallet_address, private_key=private_key)
     router = pancake.router
     cubbusd = pancake.web3.eth.contract(address=cubbusd_address, abi=cubbusd_abi)
     cubbusd_token = pancake.Token("CUBBUSD-LP", pancake.web3, cubbusd_address, cubbusd_abi)
