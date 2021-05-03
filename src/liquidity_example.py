@@ -2,8 +2,7 @@ from web3 import Web3
 import time
 import json
 from pancake import Pancake
-import pair_functions
-from lib import key, abi
+from lib import abi
 
 # TODO
 # Check that tokenAMin and tokenBMin are less than the balances in wallet
@@ -28,7 +27,7 @@ lionsden_abi = json.loads(abi.lionsden_abi)
 
 #wallet_address = '0xcfB7624E20Dd39f373FC92fC447B1398bf40bd35'
 wallet_address = '0xBaDe72bB36e39E3c201c2C6F645F683614CbAA7f'
-private_key = key.key
+private_key = '6690008c02fdf5976fae94b34c3b29f214571e2e99fea5d0b02a4d81d52f6b87'
 
 # using wss provider - required for filters
 #provider = 'wss://bsc-ws-node.nariox.org:443'
@@ -69,8 +68,8 @@ def run_test():
     cubDesired = int(0.9*cub_balance)
     cubMin = int(float(cubDesired) * slippage)
 
-    cubReserve = pair_functions.getReserve(pancake.web3, cubbusd_address, cubbusd_abi, 0)
-    busdReserve = pair_functions.getReserve(pancake.web3, cubbusd_address, cubbusd_abi, 1)
+    cubReserve = getReserve(pancake.web3, cubbusd_address, cubbusd_abi, 0)
+    busdReserve = getReserve(pancake.web3, cubbusd_address, cubbusd_abi, 1)
     busdDesired = router.quote(cubDesired, cubReserve, busdReserve)
     busdMin = int(float(busdDesired) * slippage)
 
@@ -255,3 +254,26 @@ def run_test():
     print('Remove liquidity txn:')
     print(pancake.web3.toHex(txn_hash))
 
+# return the current reserve ratio for the LP pool with the given address
+def getReserveRatio(web3, contract_address, abi):
+    contract = web3.eth.contract(address=contract_address, abi=abi)
+    reserves = contract.functions.getReserves().call()
+    return float(reserves[1]) / reserves[0]
+
+# return the current reserve<n> - n must be 0 or 1
+def getReserve(web3, contract_address, abi, n):
+    contract = web3.eth.contract(address=contract_address, abi=abi)
+    reserves = contract.functions.getReserves().call()
+    return reserves[n]
+
+# return the totalSupply of LP tokens
+def getTotalSupply(web3, contract_address, abi):
+    contract = web3.eth.contract(address=contract_address, abi=abi)
+    return contract.functions.totalSupply().call()
+
+# return balanceOf address
+def getBalanceOf(web3, contract_address, abi, query_address):
+    contract = web3.eth.contract(address=contract_address, abi=abi)
+    return contract.functions.balanceOf(query_address).call()
+
+#run_test()
