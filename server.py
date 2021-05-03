@@ -11,7 +11,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(HTTPStatus.OK)
         self.end_headers()
         msg = 'Welcome to yieldfarmer001! You requested the following route %s' % (self.path)
-        if self.path == '/new':
+        if self.path == '/runtest':
             msg = 'This is a new path: %s ... runing run_test function' % (self.path)
             liquidity_example.run_test()
         self.wfile.write(msg.encode())
