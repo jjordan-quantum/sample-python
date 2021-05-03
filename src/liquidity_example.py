@@ -241,16 +241,6 @@ def run_test():
     txn_hash = pancake.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
     receipt = pancake.web3.eth.wait_for_transaction_receipt(txn_hash)
 
-
-    txn_hash = router.addLiquidity(sender=wallet_address,
-                                   tokenA=cub.address,
-                                   tokenB=busd.address,
-                                   amountADesired=cubDesired,
-                                   amountBDesired=busdDesired,
-                                   amountAMin=cubMin,
-                                   amountBMin=busdMin,
-                                   private_key=private_key)
-
     print('Remove liquidity txn:')
     print(pancake.web3.toHex(txn_hash))
 
