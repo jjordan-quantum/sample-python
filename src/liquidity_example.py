@@ -1,6 +1,7 @@
 import time
 import json
-from lib import abi, pancake
+import lib.abi as abi
+import lib.pancake as pancake
 
 # TODO
 # Check that tokenAMin and tokenBMin are less than the balances in wallet
