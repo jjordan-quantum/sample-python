@@ -1,8 +1,6 @@
-from web3 import Web3
 import time
 import json
-import pancake
-from lib import abi
+from lib import abi, pancake
 
 # TODO
 # Check that tokenAMin and tokenBMin are less than the balances in wallet
@@ -33,8 +31,8 @@ wallet_address = '0xBaDe72bB36e39E3c201c2C6F645F683614CbAA7f'
 #web3 = Web3(Web3.WebsocketProvider(provider))
 
 # using http provider
-provider = 'https://bsc-dataseed.binance.org/'
-web3 = Web3(Web3.HTTPProvider(provider))
+#provider = 'https://bsc-dataseed.binance.org/'
+#web3 = Web3(Web3.HTTPProvider(provider))
 
 # required for reading timestamps from block objects
 '''
@@ -49,7 +47,7 @@ web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 def run_test(private_key):
     txns = ""
     # instantiate Pancake
-    pancake = Pancake(wallet=wallet_address, private_key=private_key)
+    pancake = pancake.Pancake(wallet=wallet_address, private_key=private_key)
     router = pancake.router
     cubbusd = pancake.web3.eth.contract(address=cubbusd_address, abi=cubbusd_abi)
     cubbusd_token = pancake.Token("CUBBUSD-LP", pancake.web3, cubbusd_address, cubbusd_abi)
