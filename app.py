@@ -14,6 +14,6 @@ def hello_runtest():
 
 @app.route('/safe_add')
 def hello_safeadd():
-    sum = functions.safe_add(1+2)
+    sum = functions.safe_add(1, 2)
     msg = f'Hello! This is the safe_add route\n, 1 + 2 = {sum}'
     return msg
