@@ -1,7 +1,7 @@
 from web3 import Web3
 import time
 import json
-from pancake import Pancake
+import pancake
 from lib import abi
 
 # TODO
