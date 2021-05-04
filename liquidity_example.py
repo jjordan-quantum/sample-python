@@ -48,14 +48,14 @@ web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 def run_test(private_key):
     txns = ""
     # instantiate Pancake
-    pancake = pancake.Pancake(wallet=wallet_address, private_key=private_key)
-    router = pancake.router
-    cubbusd = pancake.web3.eth.contract(address=cubbusd_address, abi=cubbusd_abi)
-    cubbusd_token = pancake.Token("CUBBUSD-LP", pancake.web3, cubbusd_address, cubbusd_abi)
+    client = pancake.Pancake(wallet=wallet_address, private_key=private_key)
+    router = client.router
+    cubbusd = client.web3.eth.contract(address=cubbusd_address, abi=cubbusd_abi)
+    cubbusd_token = client.Token("CUBBUSD-LP", client.web3, cubbusd_address, cubbusd_abi)
 
     # create local references to the desired Token objects
-    cub = pancake.tokens["CUB"]     # reserve0
-    busd = pancake.tokens["BUSD"]   # reserve1
+    cub = client.tokens["CUB"]     # reserve0
+    busd = client.tokens["BUSD"]   # reserve1
 
     slippage = 0.95
 
@@ -67,8 +67,8 @@ def run_test(private_key):
     cubDesired = int(0.9*cub_balance)
     cubMin = int(float(cubDesired) * slippage)
 
-    cubReserve = getReserve(pancake.web3, cubbusd_address, cubbusd_abi, 0)
-    busdReserve = getReserve(pancake.web3, cubbusd_address, cubbusd_abi, 1)
+    cubReserve = getReserve(client.web3, cubbusd_address, cubbusd_abi, 0)
+    busdReserve = getReserve(client.web3, cubbusd_address, cubbusd_abi, 1)
     busdDesired = router.quote(cubDesired, cubReserve, busdReserve)
     busdMin = int(float(busdDesired) * slippage)
 
@@ -81,7 +81,7 @@ def run_test(private_key):
                               private_key=private_key)
 
     print('Approve CUB txn:')
-    txns += str(pancake.web3.toHex(approve_cub))
+    txns += str(client.web3.toHex(approve_cub))
 
     approve_busd = busd.approve(sender=wallet_address,
                                 spender=router.address,
@@ -89,13 +89,13 @@ def run_test(private_key):
                                 private_key=private_key)
 
     print('Approve BUSD txn:')
-    txns += '\n'+str(pancake.web3.toHex(approve_busd))
+    txns += '\n'+str(client.web3.toHex(approve_busd))
 
 
     current_unix_time = int(time.time())
     unix_deadline = current_unix_time + 120
 
-    nonce = pancake.web3.eth.get_transaction_count(wallet_address)
+    nonce = client.web3.eth.get_transaction_count(wallet_address)
 
     txn = router.contract.functions.addLiquidity(
                     cub.address,
@@ -108,16 +108,16 @@ def run_test(private_key):
                     unix_deadline
                 ).buildTransaction({
                     'gas': 300000,
-                    'gasPrice': pancake.web3.eth.gas_price,
+                    'gasPrice': client.web3.eth.gas_price,
                     'nonce': nonce
                 })
 
-    signed_txn = pancake.web3.eth.account.sign_transaction(txn, private_key=private_key)
-    txn_hash = pancake.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    receipt = pancake.web3.eth.wait_for_transaction_receipt(txn_hash)
+    signed_txn = client.web3.eth.account.sign_transaction(txn, private_key=private_key)
+    txn_hash = client.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    receipt = client.web3.eth.wait_for_transaction_receipt(txn_hash)
 
     print('Add liquidity txn:')
-    txns += '\n'+str(pancake.web3.toHex(txn_hash))
+    txns += '\n'+str(client.web3.toHex(txn_hash))
 
     # STAKE ON CUB FARMS
 
@@ -137,19 +137,19 @@ def run_test(private_key):
                                            amount=amount,
                                            private_key=private_key)
         print('Approve CUB-BUSD LP txn:')
-        txns += '\n'+str(pancake.web3.toHex(approve_lp))
+        txns += '\n'+str(client.web3.toHex(approve_lp))
 
 
     # STAKE LP-TOKENS IN POOL
 
     # lionsden contract instance (main staking contract)
-    lionsden = pancake.web3.eth.contract(address=lionsden_address, abi=lionsden_abi)
+    lionsden = client.web3.eth.contract(address=lionsden_address, abi=lionsden_abi)
 
     # pool ID
     pid = 10 # CUB-BUSD pool
 
     # set nonce
-    nonce = pancake.web3.eth.get_transaction_count(wallet_address)
+    nonce = client.web3.eth.get_transaction_count(wallet_address)
 
     # build stake txn
     stake_txn = lionsden.functions.deposit(
@@ -157,16 +157,16 @@ def run_test(private_key):
                     amount
                 ).buildTransaction({
                     'gas': 200000,
-                    'gasPrice': pancake.web3.eth.gas_price,
+                    'gasPrice': client.web3.eth.gas_price,
                     'nonce': nonce
                 })
 
-    signed_txn = pancake.web3.eth.account.sign_transaction(stake_txn, private_key=private_key)
-    txn_hash = pancake.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    receipt = pancake.web3.eth.wait_for_transaction_receipt(txn_hash)
+    signed_txn = client.web3.eth.account.sign_transaction(stake_txn, private_key=private_key)
+    txn_hash = client.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    receipt = client.web3.eth.wait_for_transaction_receipt(txn_hash)
 
     print('Stake on cubdefi pool txn:')
-    txns += '\n'+str(pancake.web3.toHex(txn_hash))
+    txns += '\n'+str(client.web3.toHex(txn_hash))
 
     # UNSTAKE LP-TOKENS FROM POOL
 
@@ -176,7 +176,7 @@ def run_test(private_key):
     amount = pool_balance
 
     # set nonce
-    nonce = pancake.web3.eth.get_transaction_count(wallet_address)
+    nonce = client.web3.eth.get_transaction_count(wallet_address)
 
     # build unstake txn
     unstake_txn = lionsden.functions.withdraw(
@@ -184,16 +184,16 @@ def run_test(private_key):
                     amount
                 ).buildTransaction({
                     'gas': 200000,
-                    'gasPrice': pancake.web3.eth.gas_price,
+                    'gasPrice': client.web3.eth.gas_price,
                     'nonce': nonce
                 })
 
-    signed_txn = pancake.web3.eth.account.sign_transaction(unstake_txn, private_key=private_key)
-    txn_hash = pancake.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    receipt = pancake.web3.eth.wait_for_transaction_receipt(txn_hash)
+    signed_txn = client.web3.eth.account.sign_transaction(unstake_txn, private_key=private_key)
+    txn_hash = client.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    receipt = client.web3.eth.wait_for_transaction_receipt(txn_hash)
 
     print('Unstake from cubdefi pool txn:')
-    txns += '\n'+str(pancake.web3.toHex(txn_hash))
+    txns += '\n'+str(client.web3.toHex(txn_hash))
 
     # REMOVE LIQUIDITY
 
@@ -207,7 +207,7 @@ def run_test(private_key):
                                               private_key=private_key)
 
     print('Approve LP-token txn:')
-    txns += '\n'+str(pancake.web3.toHex(approve_liquidity))
+    txns += '\n'+str(client.web3.toHex(approve_liquidity))
 
     totalSupply = cubbusd.functions.totalSupply().call()
     percent_of_liquidity = float(liquidity) / totalSupply
@@ -222,7 +222,7 @@ def run_test(private_key):
     current_unix_time = int(time.time())
     unix_deadline = current_unix_time + 120
 
-    nonce = pancake.web3.eth.get_transaction_count(wallet_address)
+    nonce = client.web3.eth.get_transaction_count(wallet_address)
 
     txn = router.contract.functions.removeLiquidity(
                     cub.address,
@@ -234,16 +234,16 @@ def run_test(private_key):
                     unix_deadline
                 ).buildTransaction({
                     'gas': 300000,
-                    'gasPrice': pancake.web3.eth.gas_price,
+                    'gasPrice': client.web3.eth.gas_price,
                     'nonce': nonce
                 })
 
-    signed_txn = pancake.web3.eth.account.sign_transaction(txn, private_key=private_key)
-    txn_hash = pancake.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    receipt = pancake.web3.eth.wait_for_transaction_receipt(txn_hash)
+    signed_txn = client.web3.eth.account.sign_transaction(txn, private_key=private_key)
+    txn_hash = client.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    receipt = client.web3.eth.wait_for_transaction_receipt(txn_hash)
 
     print('Remove liquidity txn:')
-    txns += '\n'+str(pancake.web3.toHex(txn_hash))
+    txns += '\n'+str(client.web3.toHex(txn_hash))
 
     return txns
 
