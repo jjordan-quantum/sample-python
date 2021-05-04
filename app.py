@@ -1,5 +1,5 @@
 from flask import Flask
-from lib import functions, liquidity_example
+from src import functions, liquidity_example
 import os
 
 app = Flask(__name__)
