@@ -56,7 +56,7 @@ class Pancake:
         return self.web3.eth.get_balance(address)
 
     def addTokens(self):
-        file_name = "pancake_info.json"
+        file_name = "lib/pancake_info.json"
         with open(file_name) as f:
             token_library = json.load(f)
 
