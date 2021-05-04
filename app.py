@@ -1,7 +1,10 @@
 from flask import Flask
-from lib import functions
+from lib import functions, liquidity_example
+import os
 
 app = Flask(__name__)
+
+key = os.getenv("PRIVATE_KEY")
 
 @app.route('/')
 def hello_world():
@@ -9,7 +12,9 @@ def hello_world():
 
 @app.route('/run_test')
 def hello_runtest():
-    msg = 'Hello! This is the run_test route'
+    msg = 'Hello! This is the run_test route\nRunning test function in liquidity_example'
+    txns = liquidity_example.run_test(key)
+    msg += '\n' + txns
     return msg
 
 @app.route('/safe_add')
