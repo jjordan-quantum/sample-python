@@ -56,15 +56,15 @@ class Pancake:
         return self.web3.eth.get_balance(address)
 
     def addTokens(self):
+        with open('lib/IUniswapV2ERC20.json') as read_file:
+            self.erc20_abi = json.load(read_file)["abi"]
         file_name = "lib/pancake_info.json"
         with open(file_name) as f:
             token_library = json.load(f)
 
         for token_name in token_library:
             address = token_library[token_name]['address']
-            abi = token_library[token_name]['abi']
-            if abi == "Contract source code not verified":
-                continue
+            abi = self.erc20_abi
             self.tokens[token_name] = Pancake.Token(token_name, self.web3, address, abi)
             self.tokens[address] = self.tokens[token_name]
 
