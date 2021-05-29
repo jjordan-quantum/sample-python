@@ -388,7 +388,7 @@ def get_balance_of(token, account):
 ######################################################################################
 
 
-def swap_exact_tokens_for_tokens(self, amount, min_out, path, to, deadline, gas=None, gas_price=None):
+def swap_exact_tokens_for_tokens(amount, min_out, path, to, deadline, gas=None, gas_price=None):
     """
     Swaps an exact amount of input tokens for as many output tokens as
     possible, along the route determined by the path. The first element of
@@ -404,12 +404,12 @@ def swap_exact_tokens_for_tokens(self, amount, min_out, path, to, deadline, gas=
     :return: Transaction receipt.
     """
 
-    func = self.router.functions.swapExactTokensForTokens(amount, min_out, path, to, deadline)
-    params = self._create_transaction_params(gas=gas, gas_price=gas_price)
-    txn_receipt = self._send_transaction(func, params)
+    func = router.functions.swapExactTokensForTokens(amount, min_out, path, to, deadline)
+    params = _create_transaction_params(gas=gas, gas_price=gas_price)
+    txn_receipt = _send_transaction(func, params)
     return txn_receipt
 
-def swap_tokens_for_exact_tokens(self, amount_out, amount_in_max, path, to, deadline, gas=None, gas_price=None):
+def swap_tokens_for_exact_tokens(amount_out, amount_in_max, path, to, deadline, gas=None, gas_price=None):
     """
     Receive an exact amount of output tokens for as few input tokens as
     possible, along the route determined by the path. The first element of
@@ -425,9 +425,93 @@ def swap_tokens_for_exact_tokens(self, amount_out, amount_in_max, path, to, dead
     :return: Transaction receipt.
     """
 
-    func = self.router.functions.swapTokensForExactTokens(amount_out, amount_in_max, path, to, deadline)
-    params = self._create_transaction_params(gas=gas, gas_price=gas_price)
-    txn_receipt = self._send_transaction(func, params)
+    func = router.functions.swapTokensForExactTokens(amount_out, amount_in_max, path, to, deadline)
+    params = _create_transaction_params(gas=gas, gas_price=gas_price)
+    txn_receipt = _send_transaction(func, params)
+    return txn_receipt
+
+
+def swap_exact_eth_for_tokens(amount, min_out, path, to, deadline, gas=None, gas_price=None):
+    """
+    Swaps an exact amount of ETH for as many output tokens as possible,
+    along the route determined by the path. The first element of path must
+    be WETH, the last is the output token, and any intermediate elements
+    represent intermediate pairs to trade through (if for example, a direct
+    pair does not exist).
+
+    :param amount: Amount of ETH to send.
+    :param min_out: Minimum amount of output tokens that must be received for the transaction not to revert.
+    :param path: Array of token addresses (pools of consecutive pair of addresses must exist and have liquidity).
+    :param to: Address of the recipient for the output tokens.
+    :param deadline: Unix timestamp after which the transaction will revert.
+    :return: Transaction receipt.
+    """
+
+    func = router.functions.swapExactETHForTokens(min_out, path, to, deadline)
+    params = _create_transaction_params(value=amount, gas=gas, gas_price=gas_price)
+    txn_receipt = _send_transaction(func, params)
+    return txn_receipt
+
+def swap_tokens_for_exact_eth(amount_out, amount_in_max, path, to, deadline, gas=None, gas_price=None):
+    """
+    Receive an exact amount of ETH for as few input tokens as possible,
+    along the route determined by the path. The first element of path is the
+    input token, the last must be WETH, and any intermediate elements
+    represent intermediate pairs to trade through (if for example, a direct
+    pair does not exist).
+
+    :param amount_out: Amount of ETH to receive.
+    :param amount_in_max: Maximum amount of input tokens that can be required before the transaction reverts.
+    :param path: Array of token addresses (pools of consecutive pair of addresses must exist and have liquidity).
+    :param to: Address of the recipient for the ETH.
+    :param deadline: Unix timestamp after which the transaction will revert.
+    :return: Transaction receipt.
+    """
+
+    func = router.functions.swapTokensForExactETH(amount_out, amount_in_max, path, to, deadline)
+    params = _create_transaction_params(gas=gas, gas_price=gas_price)
+    txn_receipt = _send_transaction(func, params)
+    return txn_receipt
+
+def swap_exact_tokens_for_eth(amount, min_out, path, to, deadline, gas=None, gas_price=None):
+    """
+    Swaps an exact amount of tokens for as much ETH as possible, along
+    the route determined by the path. The first element of path is the input
+    token, the last must be WETH, and any intermediate elements represent
+    intermediate pairs to trade through (if for example, a direct pair does
+    not exist).
+
+    :param amount: Amount of input tokens to send.
+    :param min_out: Minimum amount of output tokens that must be received for the transaction not to revert.
+    :param path: Array of token addresses (pools of consecutive pair of addresses must exist and have liquidity).
+    :param to: Address of the recipient for the ETH.
+    :param deadline: Unix timestamp after which the transaction will revert.
+    :return: Transaction receipt.
+    """
+
+    func = router.functions.swapExactTokensForETH(amount, min_out, path, to, deadline)
+    params = _create_transaction_params(gas=gas, gas_price=gas_price)
+    txn_receipt = _send_transaction(func, params)
+    return txn_receipt
+
+def swap_eth_for_exact_tokens(amount_out, amount_in_max, path, to, deadline, gas=None, gas_price=None):
+    """
+    Receive an exact amount of tokens for as little ETH as possible, along
+    the route determined by the path. The first element of path must be
+    WETH, the last is the output token and any intermediate elements
+    represent intermediate pairs to trade through (if for example, a direct
+    pair does not exist).
+
+    :param amount_out: Amount of tokens to receive.
+    :param amount_in_max: Maximum amount of ETH that can be required before the transaction reverts.
+    :param path: Array of token addresses (pools of consecutive pair of addresses must exist and have liquidity).
+    :param to: Address of the recipient for the output tokens.
+    :param deadline: Unix timestamp after which the transaction will revert.
+    :return: Transaction receipt.
+    """
+    func = router.functions.swapETHForExactTokens(amount_out, path, to, deadline)
+    params = _create_transaction_params(value=amount_in_max, gas=gas, gas_price=gas_price)
+    txn_receipt = _send_transaction(func, params)
     return txn_receipt
 
 
